@@ -1,6 +1,7 @@
 import pygame
 import random
 import sys
+import button
 
 from config import config
 
@@ -114,11 +115,18 @@ def own_collision(snake_head, snake):
 if __name__ == "__main__":
     pygame.init()
     clock = pygame.time.Clock()
+    #music
     soundObj = pygame.mixer.Sound('kim-lightyear-legends-109307.mp3')
     soundObj.play(loops = -1)
+    #icons and images
+    start_button_img =pygame.image.load("startbutton.png")
+    exit_button_img = pygame.image.load("exitbutton.png")
+    restart_button_img = pygame.image.load("restartbutton.png")
     pygame.display.set_caption('Super Hadík')
     Icon = pygame.image.load('pythonik2.jpg')
-    endimage = pygame.image.load("pythonik2.jpg")
+    endimage = pygame.image.load("lostimage400px.jpg")
+    startimage = pygame.image.load("pythonik2.jpg")
+
     pygame.display.set_icon(Icon)
     window = pygame.display.set_mode(config.GAME_RES)
     snake = [[config.GAME_RES[0] // 2, config.GAME_RES[1] // 2]]
@@ -148,35 +156,35 @@ if __name__ == "__main__":
     pygame.time.set_timer(timer_event, time_delay)
     font = pygame.font.SysFont(None, 100)
     text = font.render(str(counter), True, (0, 128, 0))
+    #create buttons
+    start_button = button.Button(config.GAME_RES[0]//2-170,config.GAME_RES[1]//2+100, start_button_img,1 )
+    exit_button = button.Button(config.GAME_RES[0]//2+30,config.GAME_RES[1]//2+100, exit_button_img,1 )
+    restart_button = button.Button(config.GAME_RES[0]//2-restart_button_img.get_size()[1]-100,config.GAME_RES[1]//2+100, restart_button_img,1 )
 
     while True:
 
-        score_text = game_font.render(f"skóre {score}", True, (255, 255, 255))
-        pygame.draw.rect(window, config.APPLE_COLOR,
-                         pygame.Rect(0,0, score_text.get_size()[0] + 15, score_text.get_size()[1] + 5), 3)
-        window.blit(score_text, (5, 0))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
 
-            if (event.type == pygame.KEYDOWN and running==False):
+            if (event.type == pygame.KEYDOWN and running == False):
                 running = True
                 snake = [[config.GAME_RES[0] // 2, config.GAME_RES[1] // 2]]
                 pygame.mixer.unpause()
                 new_position = update_position(snake[0], direction, config.SNAKE_SIZE)
                 apple = generate_apple(config.GAME_RES, config.SNAKE_SIZE)
-                multi_apple= None
-                immortal_apple= None
+                multi_apple = None
+                immortal_apple = None
                 direction = "UP"
-                score=0
+                score = 0
 
 
-            elif event.type == timer_event and immortality==True:
+            elif event.type == timer_event and immortality == True:
                 counter += 1
                 text = font.render(str(counter), True, (0, 128, 0))
                 print(counter)
-                if counter >=10:
+                if counter >= 10:
                     immortality = False
                     counter = 0
                     config.COLOR_SNAKE = config.COLOR_SNAKE_BASIC
@@ -198,94 +206,128 @@ if __name__ == "__main__":
                     multi_apple = None
                     counterdurationmulti = 0
 
+        if config.START_GAME == False:
+            # menu
+            window.blit(startimage, (0, 0))
+            if start_button.draw(window):
+                config.START_GAME = True
+            if exit_button.draw(window):
+                pygame.quit()
+                sys.exit()
+            startuptext = game_font.render(f"Vitaj v hre hadík", True, (0, 0, 0))
+            window.blit(startuptext, ((config.GAME_RES[0]/2 - int(startuptext.get_width() / 2)),
+                                       (config.GAME_RES[1]/2 - int(startuptext.get_size()[1] / 2)-150)))
 
 
+          #  window.blit(endimage, (0, 0))
 
+        else:
 
-
-
-        if running:
-            ms_frame = clock.tick(config.GAME_FPS)
-            move_per_frame = config.MOVE_PER_SECOND * ms_frame / 1000
-
-            keys = pygame.key.get_pressed()
-            direction = update_direction(direction, keys)
-
-            new_position = update_position(snake[0], direction, config.SNAKE_SIZE)
-
-            bonus_ticker = random.choice(range(0, 100))
-
-            if multi_apple is None and bonus_ticker == 50:
-                multi_apple = generate_multi_apple(config.GAME_RES, config.SNAKE_SIZE)
-            if immortal_apple is None and bonus_ticker == 10:
-                immortal_apple = generate_immortal_apple(config.GAME_RES, config.SNAKE_SIZE)
-
-            if multi_apple is not None:
-                pygame.draw.rect(window, config.IMMORTAL_APPLE_COLOR,
-                                 pygame.Rect(multi_apple[0], multi_apple[1], config.SNAKE_SIZE, config.SNAKE_SIZE))
-                if is_collision(snake[0], multi_apple):
-                    print("multiCollision")
-                    multiply=True
-                    score += 3
-                    multi_apple = None
-            if immortal_apple is not None:
-                pygame.draw.rect(window, config.MULTI_APPLE_COLOR,
-                                 pygame.Rect(immortal_apple[0], immortal_apple[1], config.SNAKE_SIZE, config.SNAKE_SIZE))
-
-                if is_collision(snake[0], immortal_apple):
-                    print("immortalCollision")
-                    score += 1
-                    immortal_apple = None
-                    config.COLOR_SNAKE= pygame.Color(218,165,32)
-                    immortality=True
-                    counter=0
-
-
-
-
-            if own_collision(new_position, snake):
-               running = False
-
-            snake.insert(0, new_position)
-
-            if is_collision(snake[0], apple):
-                print("Collision")
-                apple = generate_apple(config.GAME_RES, config.SNAKE_SIZE)
-                score += 1
-            elif multiply==True:
-                if multiplier <=1:
-                    multiplier+=1
-                else:
-                    multiply=False
-                    multiplier=0
-            else:
-                snake.pop()
-
-            if is_out(new_position, config.GAME_RES,config.SNAKE_SIZE,direction) is True:
-                running=False
-             #   end_game(window)
-            check_list = isinstance(is_out(new_position, config.GAME_RES,config.SNAKE_SIZE,direction), list)
-            if check_list==True :
-                new_position = is_out(new_position, config.GAME_RES,config.SNAKE_SIZE,direction)
-                snake.insert(0, new_position)
-                snake.pop()
-
-
-            for part in snake:
-                pygame.draw.rect(window, config.COLOR_SNAKE,
-                                 pygame.Rect(part[0], part[1], config.SNAKE_SIZE, config.SNAKE_SIZE))
+            score_text = game_font.render(f"skóre {score}", True, (255, 255, 255))
             pygame.draw.rect(window, config.APPLE_COLOR,
-                             pygame.Rect(apple[0], apple[1], config.SNAKE_SIZE, config.SNAKE_SIZE))
-        if not running:
-            pygame.mixer.pause()
-            window.blit(endimage, (0, 0))
+                             pygame.Rect(0,0, score_text.get_size()[0] + 15, score_text.get_size()[1] + 5), 3)
             window.blit(score_text, (5, 0))
-            end_text = game_font.render(f"Haha, nevies hrat?"
-                                        , True, (255, 255, 255))
 
-            window.blit(end_text, ((config.GAME_RES[0]/2 - int(end_text.get_width() / 2)),
-                                   (config.GAME_RES[1]/2 - int(end_text.get_size()[1] / 2))))
+
+
+            if running:
+                ms_frame = clock.tick(config.GAME_FPS)
+                move_per_frame = config.MOVE_PER_SECOND * ms_frame / 1000
+
+                keys = pygame.key.get_pressed()
+                direction = update_direction(direction, keys)
+
+                new_position = update_position(snake[0], direction, config.SNAKE_SIZE)
+
+                bonus_ticker = random.choice(range(0, 100))
+
+                if multi_apple is None and bonus_ticker == 50:
+                    multi_apple = generate_multi_apple(config.GAME_RES, config.SNAKE_SIZE)
+                if immortal_apple is None and bonus_ticker == 10:
+                    immortal_apple = generate_immortal_apple(config.GAME_RES, config.SNAKE_SIZE)
+
+                if multi_apple is not None:
+                    pygame.draw.rect(window, config.IMMORTAL_APPLE_COLOR,
+                                     pygame.Rect(multi_apple[0], multi_apple[1], config.SNAKE_SIZE, config.SNAKE_SIZE))
+                    if is_collision(snake[0], multi_apple):
+                        print("multiCollision")
+                        multiply=True
+                        score += 3
+                        multi_apple = None
+                if immortal_apple is not None:
+                    pygame.draw.rect(window, config.MULTI_APPLE_COLOR,
+                                     pygame.Rect(immortal_apple[0], immortal_apple[1], config.SNAKE_SIZE, config.SNAKE_SIZE))
+
+                    if is_collision(snake[0], immortal_apple):
+                        print("immortalCollision")
+                        score += 1
+                        immortal_apple = None
+                        config.COLOR_SNAKE= pygame.Color(218,165,32)
+                        immortality=True
+                        counter=0
+
+
+
+
+                if own_collision(new_position, snake):
+                   running = False
+
+                snake.insert(0, new_position)
+
+                if is_collision(snake[0], apple):
+                    print("Collision")
+                    apple = generate_apple(config.GAME_RES, config.SNAKE_SIZE)
+                    score += 1
+                elif multiply==True:
+                    if multiplier <=1:
+                        multiplier+=1
+                    else:
+                        multiply=False
+                        multiplier=0
+                else:
+                    snake.pop()
+
+                if is_out(new_position, config.GAME_RES,config.SNAKE_SIZE,direction) is True:
+                    running=False
+                 #   end_game(window)
+                check_list = isinstance(is_out(new_position, config.GAME_RES,config.SNAKE_SIZE,direction), list)
+                if check_list==True :
+                    new_position = is_out(new_position, config.GAME_RES,config.SNAKE_SIZE,direction)
+                    snake.insert(0, new_position)
+                    snake.pop()
+
+
+                for part in snake:
+                    pygame.draw.rect(window, config.COLOR_SNAKE,
+                                     pygame.Rect(part[0], part[1], config.SNAKE_SIZE, config.SNAKE_SIZE))
+                pygame.draw.rect(window, config.APPLE_COLOR,
+                                 pygame.Rect(apple[0], apple[1], config.SNAKE_SIZE, config.SNAKE_SIZE))
+            if not running:
+                pygame.mixer.pause()
+                score_text = game_font.render(f"skóre {score}", True, (0, 0, 0))
+                window.blit(endimage, (0, 0))
+                window.blit(score_text, (5, 0))
+                end_text = game_font.render(f"Hahaha"
+                                            , True, (0, 0, 0),(255, 255, 255))
+
+                window.blit(end_text, ((config.GAME_RES[0]/2 - int(end_text.get_width() / 2)),
+                                       (config.GAME_RES[1]/2 - int(end_text.get_size()[1] / 2))))
+                if restart_button.draw(window):
+                    config.START_GAME = True
+                    running = True
+                    snake = [[config.GAME_RES[0] // 2, config.GAME_RES[1] // 2]]
+                    pygame.mixer.unpause()
+                    new_position = update_position(snake[0], direction, config.SNAKE_SIZE)
+                    apple = generate_apple(config.GAME_RES, config.SNAKE_SIZE)
+                    multi_apple = None
+                    immortal_apple = None
+                    direction = "UP"
+                    score = 0
+                if exit_button.draw(window):
+                    pygame.quit()
+                    sys.exit()
 
         pygame.display.update()
         window.fill(config.BACKGROUND_COLOR)
+
         clock.tick(config.GAME_FPS)
