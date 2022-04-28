@@ -9,13 +9,10 @@ from config import config
 def update_position(snake, direction, step):
     if direction == "UP":
         snake = [snake[0], snake[1] - step]
-    # snake = [round(snake[0] / 10) * 10, (round(snake[1] / 10) * 10)-step]
     if direction == "DOWN":
         snake = [snake[0], snake[1] + step]
-    #  snake = [round(snake[0] / 10) * 10, (round(snake[1] / 10) * 10)+step]
     if direction == "LEFT":
         snake = [snake[0] - step, snake[1]]
-    #  snake = [int(round((snake[0]-step) / 10) * 10), (round((snake[1] / 10) * 10))]
     if direction == "RIGHT":
         snake = [snake[0] + step, snake[1]]
     return snake
@@ -33,21 +30,26 @@ def update_direction(direction, keys):
     return direction
 
 
-def is_out(snake, game_res, step ,direction ):
-    if immortality==True and (new_position[0] < 0 or new_position[1] < 0 or new_position[0] > game_res[0] - config.SNAKE_SIZE or new_position[1] > game_res[
-        1] - config.SNAKE_SIZE or (new_position[0] <= score_text.get_size()[0]+15 and new_position[1] <= score_text.get_size()[1])):
-        if direction=="LEFT":
-            snake = [config.GAME_RES[0]- step, snake[1]]
-        if direction=="RIGHT":
-            snake = [0+ step, snake[1]]
+def is_out(snake, game_res, step, direction):
+    if immortality is True and (
+            new_position[0] < 0 or new_position[1] < 0 or new_position[0] > game_res[0] - config.SNAKE_SIZE or
+            new_position[1] > game_res[
+                1] - config.SNAKE_SIZE or (
+                    new_position[0] <= score_text.get_size()[0] + 15 and new_position[1] <= score_text.get_size()[1])):
+        if direction == "LEFT":
+            snake = [config.GAME_RES[0] - step, snake[1]]
+        if direction == "RIGHT":
+            snake = [0 + step, snake[1]]
         if direction == "UP":
             snake = [snake[0], config.GAME_RES[1] - step]
-        if direction=="DOWN":
+        if direction == "DOWN":
             snake = [snake[0], 0 + step]
 
         return snake
-    if new_position[0] < 0 or new_position[1] < 0 or new_position[0] > game_res[0] - config.SNAKE_SIZE or new_position[1] > game_res[
-        1] - config.SNAKE_SIZE or (new_position[0] <= score_text.get_size()[0]+15 and new_position[1] <= score_text.get_size()[1]):
+    if new_position[0] < 0 or new_position[1] < 0 or new_position[0] > game_res[0] - config.SNAKE_SIZE or new_position[
+        1] > game_res[
+        1] - config.SNAKE_SIZE or (
+            new_position[0] <= score_text.get_size()[0] + 15 and new_position[1] <= score_text.get_size()[1]):
         return True
     else:
         return False
@@ -59,17 +61,19 @@ def end_game(window):
     pygame.quit()
     sys.exit()
 
+
 def generate_apple(game_res, snake_size):
     while True:
-        tt= False
+        tt = False
         x = random.choice(range(0, game_res[0] - snake_size + 1, snake_size))
         y = random.choice(range(0, game_res[1] - snake_size + 1, snake_size))
-        if y <= score_text.get_size()[1]+5:
-            x = random.choice(range(round((score_text.get_size()[0]+15)/10)*10, game_res[0] - snake_size + 1, snake_size))
+        if y <= score_text.get_size()[1] + 5:
+            x = random.choice(
+                range(round((score_text.get_size()[0] + 15) / 10) * 10, game_res[0] - snake_size + 1, snake_size))
         for part in snake:
-            if [x,y] == part:
-                tt=True
-        if tt == False:
+            if [x, y] == part:
+                tt = True
+        if tt is False:
             return [x, y]
 
 
@@ -78,35 +82,40 @@ def generate_multi_apple(game_res, snake_size):
         tt = False
         x = random.choice(range(0, game_res[0] - snake_size + 1, snake_size))
         y = random.choice(range(0, game_res[1] - snake_size + 1, snake_size))
-        if y <= score_text.get_size()[1]+5:
-            x = random.choice(range(round((score_text.get_size()[0]+15)/10)*10, game_res[0] - snake_size + 1, snake_size))
+        if y <= score_text.get_size()[1] + 5:
+            x = random.choice(
+                range(round((score_text.get_size()[0] + 15) / 10) * 10, game_res[0] - snake_size + 1, snake_size))
         for part in snake:
             if [x, y] == part:
                 tt = True
-        if tt == False:
+        if tt is False:
             return [x, y]
+
 
 def generate_immortal_apple(game_res, snake_size):
     while True:
         tt = False
         x = random.choice(range(0, game_res[0] - snake_size + 1, snake_size))
         y = random.choice(range(0, game_res[1] - snake_size + 1, snake_size))
-        if y <= score_text.get_size()[1]+5:
-            x = random.choice(range(round((score_text.get_size()[0]+15)/10)*10, game_res[0] - snake_size + 1, snake_size))
+        if y <= score_text.get_size()[1] + 5:
+            x = random.choice(
+                range(round((score_text.get_size()[0] + 15) / 10) * 10, game_res[0] - snake_size + 1, snake_size))
         for part in snake:
             if [x, y] == part:
                 tt = True
-        if tt == False:
+        if tt is False:
             return [x, y]
+
 
 def is_collision(snake_head, apple):
     if snake_head[0] == apple[0] and snake_head[1] == apple[1]:
         return True
     return False
 
+
 def own_collision(snake_head, snake):
     if snake_head in snake:
-        if immortality==True:
+        if immortality is True:
             return False
         return True
     return False
@@ -115,11 +124,11 @@ def own_collision(snake_head, snake):
 if __name__ == "__main__":
     pygame.init()
     clock = pygame.time.Clock()
-    #music
+    # music
     soundObj = pygame.mixer.Sound('kim-lightyear-legends-109307.mp3')
-    soundObj.play(loops = -1)
-    #icons and images
-    start_button_img =pygame.image.load("startbutton.png")
+    soundObj.play(loops=-1)
+    # icons and images
+    start_button_img = pygame.image.load("startbutton.png")
     exit_button_img = pygame.image.load("exitbutton.png")
     restart_button_img = pygame.image.load("restartbutton.png")
     pygame.display.set_caption('Super Hadík')
@@ -133,20 +142,20 @@ if __name__ == "__main__":
     direction = "UP"
 
     running = True
-    score=0
+    score = 0
     game_font = pygame.font.SysFont("comicsans", 30)
     score_text = game_font.render(f"Score {score}", True, (255, 255, 255))
     pygame.draw.rect(window, config.APPLE_COLOR,
-                     pygame.Rect(0, 0, score_text.get_size()[0]+10, score_text.get_size()[1]+5), 3)
+                     pygame.Rect(0, 0, score_text.get_size()[0] + 10, score_text.get_size()[1] + 5), 3)
     apple = generate_apple(config.GAME_RES, config.SNAKE_SIZE)
     immortal_apple = None
     multi_apple = None
-    multiply=False
-    immortality=False
-    multiplier=0
+    multiply = False
+    immortality = False
+    multiplier = 0
 
-    counter=0
-    bonus_ticker=0
+    counter = 0
+    bonus_ticker = 0
     time_delay = 1000
     timer_event = pygame.USEREVENT + 1
     timer_event_immortal_duration = pygame.USEREVENT + 1
@@ -156,10 +165,11 @@ if __name__ == "__main__":
     pygame.time.set_timer(timer_event, time_delay)
     font = pygame.font.SysFont(None, 100)
     text = font.render(str(counter), True, (0, 128, 0))
-    #create buttons
-    start_button = button.Button(config.GAME_RES[0]//2-170,config.GAME_RES[1]//2+100, start_button_img,1 )
-    exit_button = button.Button(config.GAME_RES[0]//2+30,config.GAME_RES[1]//2+100, exit_button_img,1 )
-    restart_button = button.Button(config.GAME_RES[0]//2-restart_button_img.get_size()[1]-100,config.GAME_RES[1]//2+100, restart_button_img,1 )
+    # create buttons
+    start_button = button.Button(config.GAME_RES[0] // 2 - 170, config.GAME_RES[1] // 2 + 100, start_button_img, 1)
+    exit_button = button.Button(config.GAME_RES[0] // 2 + 30, config.GAME_RES[1] // 2 + 100, exit_button_img, 1)
+    restart_button = button.Button(config.GAME_RES[0] // 2 - restart_button_img.get_size()[1] - 100,
+                                   config.GAME_RES[1] // 2 + 100, restart_button_img, 1)
 
     while True:
 
@@ -168,7 +178,7 @@ if __name__ == "__main__":
                 pygame.quit()
                 sys.exit()
 
-            if (event.type == pygame.KEYDOWN and running == False):
+            if event.type == pygame.KEYDOWN and running is False:
                 running = True
                 snake = [[config.GAME_RES[0] // 2, config.GAME_RES[1] // 2]]
                 pygame.mixer.unpause()
@@ -179,8 +189,7 @@ if __name__ == "__main__":
                 direction = "UP"
                 score = 0
 
-
-            elif event.type == timer_event and immortality == True:
+            elif event.type == timer_event and immortality is True:
                 counter += 1
                 text = font.render(str(counter), True, (0, 128, 0))
                 print(counter)
@@ -206,7 +215,7 @@ if __name__ == "__main__":
                     multi_apple = None
                     counterdurationmulti = 0
 
-        if config.START_GAME == False:
+        if config.START_GAME is False:
             # menu
             window.blit(startimage, (0, 0))
             if start_button.draw(window):
@@ -215,20 +224,14 @@ if __name__ == "__main__":
                 pygame.quit()
                 sys.exit()
             startuptext = game_font.render(f"Vitaj v hre hadík", True, (0, 0, 0))
-            window.blit(startuptext, ((config.GAME_RES[0]/2 - int(startuptext.get_width() / 2)),
-                                       (config.GAME_RES[1]/2 - int(startuptext.get_size()[1] / 2)-150)))
-
-
-          #  window.blit(endimage, (0, 0))
+            window.blit(startuptext, ((config.GAME_RES[0] / 2 - int(startuptext.get_width() / 2)),
+                                      (config.GAME_RES[1] / 2 - int(startuptext.get_size()[1] / 2) - 150)))
 
         else:
-
             score_text = game_font.render(f"skóre {score}", True, (255, 255, 255))
             pygame.draw.rect(window, config.APPLE_COLOR,
-                             pygame.Rect(0,0, score_text.get_size()[0] + 15, score_text.get_size()[1] + 5), 3)
+                             pygame.Rect(0, 0, score_text.get_size()[0] + 15, score_text.get_size()[1] + 5), 3)
             window.blit(score_text, (5, 0))
-
-
 
             if running:
                 ms_frame = clock.tick(config.GAME_FPS)
@@ -251,26 +254,24 @@ if __name__ == "__main__":
                                      pygame.Rect(multi_apple[0], multi_apple[1], config.SNAKE_SIZE, config.SNAKE_SIZE))
                     if is_collision(snake[0], multi_apple):
                         print("multiCollision")
-                        multiply=True
+                        multiply = True
                         score += 3
                         multi_apple = None
                 if immortal_apple is not None:
                     pygame.draw.rect(window, config.MULTI_APPLE_COLOR,
-                                     pygame.Rect(immortal_apple[0], immortal_apple[1], config.SNAKE_SIZE, config.SNAKE_SIZE))
+                                     pygame.Rect(immortal_apple[0], immortal_apple[1], config.SNAKE_SIZE,
+                                                 config.SNAKE_SIZE))
 
                     if is_collision(snake[0], immortal_apple):
                         print("immortalCollision")
                         score += 1
                         immortal_apple = None
-                        config.COLOR_SNAKE= pygame.Color(218,165,32)
-                        immortality=True
-                        counter=0
-
-
-
+                        config.COLOR_SNAKE = pygame.Color(218, 165, 32)
+                        immortality = True
+                        counter = 0
 
                 if own_collision(new_position, snake):
-                   running = False
+                    running = False
 
                 snake.insert(0, new_position)
 
@@ -278,24 +279,23 @@ if __name__ == "__main__":
                     print("Collision")
                     apple = generate_apple(config.GAME_RES, config.SNAKE_SIZE)
                     score += 1
-                elif multiply==True:
-                    if multiplier <=1:
-                        multiplier+=1
+                elif multiply is True:
+                    if multiplier <= 1:
+                        multiplier += 1
                     else:
-                        multiply=False
-                        multiplier=0
+                        multiply = False
+                        multiplier = 0
                 else:
                     snake.pop()
 
-                if is_out(new_position, config.GAME_RES,config.SNAKE_SIZE,direction) is True:
-                    running=False
-                 #   end_game(window)
-                check_list = isinstance(is_out(new_position, config.GAME_RES,config.SNAKE_SIZE,direction), list)
-                if check_list==True :
-                    new_position = is_out(new_position, config.GAME_RES,config.SNAKE_SIZE,direction)
+                if is_out(new_position, config.GAME_RES, config.SNAKE_SIZE, direction) is True:
+                    running = False
+                #   end_game(window)
+                check_list = isinstance(is_out(new_position, config.GAME_RES, config.SNAKE_SIZE, direction), list)
+                if check_list is True:
+                    new_position = is_out(new_position, config.GAME_RES, config.SNAKE_SIZE, direction)
                     snake.insert(0, new_position)
                     snake.pop()
-
 
                 for part in snake:
                     pygame.draw.rect(window, config.COLOR_SNAKE,
@@ -307,11 +307,10 @@ if __name__ == "__main__":
                 score_text = game_font.render(f"skóre {score}", True, (0, 0, 0))
                 window.blit(endimage, (0, 0))
                 window.blit(score_text, (5, 0))
-                end_text = game_font.render(f"Hahaha"
-                                            , True, (0, 0, 0),(255, 255, 255))
+                end_text = game_font.render(f"Hahaha", True, (0, 0, 0), (255, 255, 255))
 
-                window.blit(end_text, ((config.GAME_RES[0]/2 - int(end_text.get_width() / 2)),
-                                       (config.GAME_RES[1]/2 - int(end_text.get_size()[1] / 2))))
+                window.blit(end_text, ((config.GAME_RES[0] / 2 + int(end_text.get_width() / 2)),
+                                       (config.GAME_RES[1] / 2 - int(end_text.get_size()[1] / 2)-150)))
                 if restart_button.draw(window):
                     config.START_GAME = True
                     running = True
